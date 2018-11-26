@@ -13,7 +13,7 @@ var password = ""
 var conn = mysql.createConnection({
   host      : 'localhost',
   user      : 'root',
-  password  : 'dlwngid1!',
+  password  : 'dlwngid1',
   database  : 'mobileSW'
 })
 
@@ -69,8 +69,6 @@ app.get("/get_class/:year/:hakgi/:password", function(req, res){
 
       var html = await page.content()
       var $ = cheerio.load(html);
-
-
       for (var i = 2; i < 17; i++){
         $('body > form > table:nth-child(2) > tbody > tr > td > center > table:nth-child(2) > tbody > tr:nth-child(2) > td > center > table.table1 > tbody > tr:nth-child(' + String(i) + ')').each(function(){
             var str_temp = $(this).text()
@@ -79,6 +77,7 @@ app.get("/get_class/:year/:hakgi/:password", function(req, res){
               list_class_temp[o] = list_temp[j].replace(/^\s*/, "")
               o ++
             }
+            var result = Array()
             var result = list_class_temp[5] + "//" + list_class_temp[11] + "//" + list_class_temp[12] + "//" + list_class_temp[14] + "//" + list_class_temp[15]
             list_class[k] = result
             temptepm += result + "\n"
@@ -89,19 +88,57 @@ app.get("/get_class/:year/:hakgi/:password", function(req, res){
         })
       }
     }
-    console.log(list_class)
-    fs.writeFile('file01_async.txt', temptepm, 'utf-8', function(e){
+    fs.writeFile('list_timetable.txt', temptepm, 'utf-8', function(e){
       if(e){
           // 3. 파일생성 중 오류가 발생하면 오류출력
           console.log(e);
       }else{
           // 4. 파일생성 중 오류가 없으면 완료 문자열 출력
           console.log('01 WRITE DONE!');
-    }
+        }
+    });
+    res.send("done");
+    await browser.close()
+
+  })();
+
+})
+
+app.get('/DBupdate', function(req, res) {
+  console.log("@" + req.method + " " + req.url);
+  var sql_del_table = 'DROP TABLE scheduledata';
+  conn.query(sql_del_table, function(err, result){
+    if(err) throw err;
+    console.log("Table deleted");
+  })
+
+  var sql_new_table = 'CREATE TABLE scheduledata (subject varchar(30), professor varchar(30), major varchar(20), time varchar(40), room varchar(30))';
+  conn.query(sql_new_table, function (err, result){
+    if(err) throw err;
+    console.log("Table created");
   });
 
-     res.send(list_class);
-  })();
+  var sql_load = "load data local infile 'list_timetable.txt' into table scheduledata fields terminated by '//' lines terminated by '\n'";
+  conn.query(sql_load, function (err, result){
+    if(err) throw err;
+    console.log("data load --> complete");
+  });
+
+  res.send("done")
+})
+
+app.get('/schedule', function(req,res) {
+  console.log("@" + req.method + " " + req.url);
+  var sql_schedule = 'SELECT * FROM scheduledata';
+  conn.query(sql_schedule, function(err, result, fields){
+    if(err){
+      console.log(err);
+    }
+    else {
+      console.log(result)
+      res.send(result)
+    }
+  });
 })
 
 
