@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.os.Build
 import android.support.v4.app.NotificationCompat
@@ -23,9 +22,6 @@ class NotificationHelper(base: Context): ContextWrapper(base){
     lateinit var vibrate : LongArray
     internal var exist : Boolean = false
     var minute = 0
-    var lastClass = ClassSchedule("수학")
-    var currClass = ClassSchedule("수학")
-
 
     fun initView(){
         kauIntent = packageManager.getLaunchIntentForPackage("kr.co.symtra.kauid")
@@ -41,7 +37,7 @@ class NotificationHelper(base: Context): ContextWrapper(base){
     fun generateAlarm(){
         builder.setSmallIcon(R.drawable.kauimg)
         builder.setContentTitle("그대여, 출첵은 하셨는가?")
-        builder.setContentText("~~수업 출석체크 하려면 클릭!")//~~수업 내용은 추 후 수업 내용에 따라 달라져야 하므로 변수를 집어넣어 줄 것이다. aboutview 내부에서 변경되게끔!
+        builder.setContentText("수업 출석체크 하려면 클릭!")//~~수업 내용은 추 후 수업 내용에 따라 달라져야 하므로 변수를 집어넣어 줄 것이다. aboutview 내부에서 변경되게끔!
         builder.setVibrate(vibrate)
         builder.setAutoCancel(true) //알림을 클릭했을 때 알림이 사라지도록
         builder.setContentIntent(pendingIntent)
@@ -70,7 +66,7 @@ class NotificationHelper(base: Context): ContextWrapper(base){
 
             try {
                 for (i in mApps.indices) {
-                    if (mApps[i].activityInfo.packageName.startsWith("kr.co.symtra.kauid\"")) {
+                    if (mApps[i].activityInfo.packageName.startsWith("kr.co.symtra.kauid")) {
                         isExist = true
                         break
                     }
