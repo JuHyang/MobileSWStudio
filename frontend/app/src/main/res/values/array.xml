@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="major">
+        <item>전체</item>
+        <item>경영학부</item>
+        <item>무인기융합전공</item>
+        <item>물류전공</item>
+        <item>소프트웨어학과</item>
+        <item>영어학과</item>
+        <item>인문자연학부</item>
+        <item>자율주행융합전공</item>
+        <item>항공교통물류학부</item>
+        <item>항공교통전공</item>
+        <item>항공우주및기계공학부</item>
+        <item>항공우주법전공</item>
+        <item>항공운항학과</item>
+        <item>항공재료공학과</item>
+        <item>항공전자정보공학부</item>
+    </string-array>
+    <string-array name="lecture">
+    </string-array>
+    <string-array name="professor">
+    </string-array>
+    <string-array name="time">
+    </string-array>
+    <string-array name="place">
+    </string-array>
+</resources>

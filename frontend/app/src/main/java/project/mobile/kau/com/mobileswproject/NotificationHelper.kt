@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.ResolveInfo
 import android.os.Build
 import android.support.v4.app.NotificationCompat
+import project.mobile.kau.com.mobileswproject.R
 import java.lang.Exception
 import java.util.*
 

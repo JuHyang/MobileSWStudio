@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TableLayout
+        android:id="@+id/table"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_marginTop="20dp"
+            >
+
+            <TextView
+                android:layout_width="85dp"
+                android:layout_height="wrap_content"
+                android:text="전공"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:id="@+id/spinner_major"
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:gravity="center"></Spinner>
+
+        </LinearLayout>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/selectingRecyclerView"
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="370dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            xmlns:android="http://schemas.android.com/apk/res/android" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/selectedRecyclerView"
+            android:scrollbars="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            xmlns:android="http://schemas.android.com/apk/res/android" />
+
+
+    </TableLayout>
+
+    <Button
+        android:id="@+id/add"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="15dp"
+        android:text="add"
+        app:layout_constraintBottom_toBottomOf="@+id/table"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</android.support.constraint.ConstraintLayout>
