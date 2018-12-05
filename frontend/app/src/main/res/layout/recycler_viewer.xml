@@ -5,21 +5,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:id="@+id/tableView"
     tools:layout_editor_absoluteY="25dp">
 
-    <TextView
-        android:id="@+id/textView_subject"
+
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 
-        android:text="subject"
-        tools:layout_editor_absoluteX="103dp"
-        tools:layout_editor_absoluteY="11dp" />
+        android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/textView_subject"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:text="subject"/>
 
         <TextView
             android:id="@+id/textView_roomNumber"

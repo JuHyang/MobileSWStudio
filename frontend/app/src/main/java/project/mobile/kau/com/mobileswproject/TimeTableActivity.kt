@@ -1,6 +1,8 @@
 package project.mobile.kau.com.mobileswproject
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
@@ -9,6 +11,8 @@ import android.widget.Button
 import com.orm.SugarRecord
 
 class TimeTableActivity : AppCompatActivity() {
+
+    var colors : ArrayList<Int> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,9 +32,18 @@ class TimeTableActivity : AppCompatActivity() {
     var recyclerViewManager: RecyclerView.LayoutManager? = null
     var recyclerViewAdapter: RecyclerView.Adapter<RecyclerViewer.ViewHolder>? = null
 
-    var subjectList: ArrayList<MySubject> = SugarRecord.listAll(MySubject::class.java) as ArrayList<MySubject>
-    var informationList: ArrayList<Data> = SugarRecord.listAll(Data::class.java) as ArrayList<Data>
+    var subjectList: ArrayList<MySubject> = arrayListOf()
+    var informationList: ArrayList<Data> = arrayListOf ()
 
+
+    override fun onResume() {
+        super.onResume()
+        println("Hello")
+
+        initModel()
+        initView()
+        recyclerViewAdapter?.notifyDataSetChanged()
+    }
 
     private fun initView() {
 
@@ -46,6 +59,18 @@ class TimeTableActivity : AppCompatActivity() {
 
     private fun initModel() {
 
+        colors.clear()
+        colors.add(Color.rgb(234,133,188))
+        colors.add(Color.rgb(233,196,106))
+        colors.add(Color.rgb(162,194,106))
+        colors.add(Color.rgb(216,162,212))
+        colors.add(Color.rgb(122,161,220))
+        colors.add(Color.rgb(245,164,101))
+        colors.add(Color.rgb(129,209,191))
+
+
+        subjectList = arrayListOf()
+        informationList = SugarRecord.listAll(Data::class.java) as ArrayList<Data>
 
         var time: Int = 9
         var half: Int = 30
@@ -79,7 +104,11 @@ class TimeTableActivity : AppCompatActivity() {
         subjectList.add(MySubject("목"))
         subjectList.add(MySubject("금"))
 
-        for (j in 0..18) {
+        var maxIndex = maxIndex (informationList)
+        maxIndex /= 6
+        maxIndex += 3
+
+        for (j in 0..maxIndex) {
 
             for (i in 0..5) {
                 if (i == 0) {
@@ -91,7 +120,7 @@ class TimeTableActivity : AppCompatActivity() {
                         time++
                     }
                 } else {
-                    if (j != 18) {
+                    if (j <= maxIndex) {
                         subjectList.add(MySubject(""))
                     }
                 }
@@ -101,8 +130,8 @@ class TimeTableActivity : AppCompatActivity() {
         for (i in 0..(informationList.size - 1)) { // 요일 따로, 시간따로 구분
 
             var timeNum: String = informationList.get(i).time
-            var timeNum_arr1 = timeNum.subSequence(3, 5).toString()//2,4
-            var timeNum_arr2 = timeNum.subSequence(6, 8).toString()//5,7
+            var timeNum_arr1 = timeNum.subSequence(2, 4).toString()//2,4
+            var timeNum_arr2 = timeNum.subSequence(5, 7).toString()//5,7
             var timeNum_arr3 = Integer.parseInt("$timeNum_arr1$timeNum_arr2")
             var timeNum_arr4 = Integer.parseInt("$timeNum_arr2")
             timeHalf.add(i, timeNum_arr4)
@@ -110,8 +139,8 @@ class TimeTableActivity : AppCompatActivity() {
 
 
 
-            timeNum_arr1 = timeNum.subSequence(9, 11).toString()//8,10
-            timeNum_arr2 = timeNum.subSequence(12, 14).toString()//11,13
+            timeNum_arr1 = timeNum.subSequence(8, 10).toString()//8,10
+            timeNum_arr2 = timeNum.subSequence(11, 13).toString()//11,13
             timeNum_arr3 = Integer.parseInt("$timeNum_arr1$timeNum_arr2")
             timeMax.add(i, timeNum_arr3)
 
@@ -121,19 +150,19 @@ class TimeTableActivity : AppCompatActivity() {
             if (informationList.get(i).time.length > 13) {
                 var timeNum_temp: String? = timeNum.substring(14) // 두번째시간 추출
                 if (timeNum_temp?.length != null) {
-                    timeNum_arr1 = timeNum_temp?.subSequence(2, 4).toString()
-                    timeNum_arr2 = timeNum_temp?.subSequence(5, 7).toString()
+                    timeNum_arr1 = timeNum_temp?.subSequence(3, 5).toString()
+                    timeNum_arr2 = timeNum_temp?.subSequence(6, 8).toString()
                     timeNum_arr3 = Integer.parseInt("$timeNum_arr1$timeNum_arr2")
                     timeNum_arr4 = Integer.parseInt("$timeNum_arr2")
                     timeSecondHalf.add(i, timeNum_arr4)
                     timeSecondMin.add(i, timeNum_arr3)
 
-                    timeNum_arr1 = timeNum_temp?.subSequence(8, 10).toString()
-                    timeNum_arr2 = timeNum_temp?.subSequence(11, 13).toString()
+                    timeNum_arr1 = timeNum_temp?.subSequence(9, 11).toString()
+                    timeNum_arr2 = timeNum_temp?.subSequence(12, 14).toString()
                     timeNum_arr3 = Integer.parseInt("$timeNum_arr1$timeNum_arr2")
                     timeSecondMax.add(i, timeNum_arr3)
 
-                    subjectSecondDay.add(i, timeNum_temp?.subSequence(0, 1).toString())
+                    subjectSecondDay.add(i, timeNum_temp?.subSequence(1, 2).toString())
                 }
             } else {
                 subjectSecondDay.add(i, "")
@@ -195,22 +224,20 @@ class TimeTableActivity : AppCompatActivity() {
                 500 -> sucessiveSecondClassTime = 10
             }
 
-            for (j in 0..18) {
+            for (j in 0..maxIndex) {
                 if (cnt > sucessiveClassTime) {
                     cnt = 1
                     break
                 }
                 for (k in 0..5) {
                     if (j == fitableStartRowNum && k == fitableColumNum) {
+                        subjectList[position].color = colors[i]
                         if (cnt == 1) {
                             subjectList[position].subjectName = "${informationList.get(i).subject}"
 
                         }
                         if (cnt == 2) {
                             subjectList[position].roomNumber = "${roomFirstName[i]}"
-                        }
-                        if (cnt > 3) {
-                            subjectList[position].subjectName = "과목"
                         }
                         fitableStartRowNum++
                         cnt++
@@ -244,13 +271,14 @@ class TimeTableActivity : AppCompatActivity() {
                     430 -> sucessiveSecondClassTime = 9
                     500 -> sucessiveSecondClassTime = 10
                 }
-                for (j in 0..18) {
+                for (j in 0..maxIndex) {
                     if (cntSecond > sucessiveSecondClassTime) {
                         cntSecond = 1
                         break
                     }
                     for (k in 0..5) {
                         if (j == fitableSecondStartRowNum && k == fitableSecondColumNum) {
+                            subjectList[positionSecond].color = colors[i]
                             if (cntSecond == 1) {
                                 subjectList[positionSecond].subjectName = "${informationList.get(i).subject}"
                             }
@@ -261,9 +289,6 @@ class TimeTableActivity : AppCompatActivity() {
                                     subjectList[positionSecond].roomNumber = "${roomFirstName[i]}"
                                 }
                             }
-                            if (cntSecond > 2) {
-                                subjectList[positionSecond].subjectName = "과목"
-                            }
                             fitableSecondStartRowNum++
                             cntSecond++
                         }
@@ -272,5 +297,52 @@ class TimeTableActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+
+    fun maxIndex (list : ArrayList<Data>) : Int {
+
+
+        var max = 0
+
+        var time = ""
+        for (i in 0..(list.size - 1)) {
+            var index = 0
+            var time_arr = list[i].time.split("/")
+
+            for (j in 0..(time_arr.size - 1)) {
+                var temp_time = time_arr[j]
+                if (temp_time.contains("월")) {
+                    index = 1
+                } else if (temp_time.contains("화")) {
+                    index = 2
+                } else if (temp_time.contains("수")) {
+                    index = 3
+                } else if (temp_time.contains("목")) {
+                    index = 4
+                } else if (temp_time.contains("금")) {
+                    index = 5
+                }
+
+                temp_time.substring(2)
+
+                var timeNum_arr = temp_time.split("∼")
+                var hour : Int = 0
+                var timeHour_arr : List<String> = listOf()
+
+                timeHour_arr = timeNum_arr[1].split(":")
+                hour = Integer.parseInt(timeHour_arr[0])
+                var timeNum_2 = ((hour - 9) * 2 + 1) * 6 + index
+                if (timeHour_arr[1].equals("30")) {
+                    timeNum_2 += 6
+                }
+
+                if (max < timeNum_2) {
+                    max = timeNum_2
+                }
+            }
+        }
+
+        return max
     }
 }

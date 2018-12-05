@@ -1,5 +1,6 @@
 package project.mobile.kau.com.mobileswproject
 
+import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -10,12 +11,15 @@ import android.widget.TextView
 import org.w3c.dom.Text
 
 class RecyclerViewer(subjectList : ArrayList<MySubject>) : RecyclerView.Adapter<RecyclerViewer.ViewHolder>() {
+
+
     private var mySubjectList : ArrayList<MySubject> = subjectList
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view){
         var textView_subject : TextView = view.findViewById(R.id.textView_subject)
         //var textView_buildingName : TextView = view.findViewById(R.id.textView_buidingName)
         var textView_roomNumber : TextView = view.findViewById(R.id.textView_roomNumber)
+        var tableView : View = view.findViewById(R.id.tableView)
 
     }
     override fun onBindViewHolder(viewHolder: RecyclerViewer.ViewHolder, position: Int) {
@@ -23,6 +27,7 @@ class RecyclerViewer(subjectList : ArrayList<MySubject>) : RecyclerView.Adapter<
         viewHolder.textView_subject.text = temp.subjectName
         //viewHolder.textView_buildingName.text = temp.buildingName
         viewHolder.textView_roomNumber.text = temp.roomNumber
+        viewHolder.tableView.setBackgroundColor(temp.color)
     }
 
     override fun getItemCount(): Int {

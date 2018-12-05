@@ -89,7 +89,8 @@ class ScheduleSelectActivity: AppCompatActivity() {
         val add: Button = findViewById(R.id.add)
         add.setOnClickListener {
             for(i:Int in 0..final_list.size-1) {
-                val temp = Data(final_list[i].subject, final_list[i].professor, final_list[i].major, final_list[i].time, final_list[i].room)
+                var room_temp = final_list[i].room[0] + final_list[i].room.subSequence(3, 6).toString()
+                val temp = Data(final_list[i].subject, final_list[i].professor, final_list[i].major, final_list[i].time, room_temp)
                 dataBase.add(temp)
                 temp.save()
             }
@@ -101,8 +102,7 @@ class ScheduleSelectActivity: AppCompatActivity() {
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, setTriggerTime(item,alarmManager, pending), 1000 * 60 * 60 * 24 * 7, pending)
             }
 
-            val intent = Intent(this,ScheduleActivity::class.java)
-            startActivity(intent)
+            finish()
         }
 
     }
@@ -111,12 +111,12 @@ class ScheduleSelectActivity: AppCompatActivity() {
         //"금)09:00∼11:00"
         val time = classSchedule.time.slice(2..classSchedule.time.length-1)
         val temp = time.split("  ")
-        val temp1 = temp[0].split("~")
+        val temp1 = temp[0].split("∼")
         val hour = temp1[0].split(":")[0].toInt()
         val minute = temp1[1].split(":")[0].toInt()
 
         if(temp.size>1){
-            val temp2 = temp[1].split("~")
+            val temp2 = temp[1].split("∼")
             val hour2 = temp1[0].split(":")[0].toInt()
             val minute2 = temp1[1].split(":")[0].toInt()
 
