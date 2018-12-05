@@ -10,7 +10,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 class ScheduleGetServerInfo{
         fun getText(array: ArrayList<Object>, select: ArrayList<Object>,adapter: ScheduleAdapter) {
             val retrofit = Retrofit.Builder()
-                    .baseUrl("http://192.168.195.126:8001")//ip address
+                    .baseUrl("http://ec2-3-16-12-40.us-east-2.compute.amazonaws.com:8001")//ip address
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 

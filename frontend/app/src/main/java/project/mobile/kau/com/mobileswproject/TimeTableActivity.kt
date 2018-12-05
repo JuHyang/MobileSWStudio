@@ -1,9 +1,11 @@
 package project.mobile.kau.com.mobileswproject
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.widget.Button
 import com.orm.SugarRecord
 
 class TimeTableActivity : AppCompatActivity() {
@@ -13,6 +15,13 @@ class TimeTableActivity : AppCompatActivity() {
         setContentView(R.layout.activity_time_table)
         initModel()
         initView()
+        val button : Button = findViewById(R.id.addButton)
+        button.setOnClickListener {
+
+            val intent = Intent(this,ScheduleSelectActivity::class.java)
+            startActivity(intent)
+
+        }
     }
 
     var recyclerView: RecyclerView? = null
@@ -55,11 +64,12 @@ class TimeTableActivity : AppCompatActivity() {
 
         var timeMax: ArrayList<Int> = ArrayList<Int>()
         var timeSecondMax: ArrayList<Int> = ArrayList<Int>()
+        /*
         informationList.add(Data("컴퓨터구조론", "교수1", "전공1", "월)10:30~12:00 수)10:30~12:00", "강의동101"))
         informationList.add(Data("알고리즘", "교수2", "전공2", "화)10:30~12:00 목)10:30~12:00", "전자관402"))
         informationList.add(Data("모바일sw", "교수3", "전공3", "수)14:00~16:00 수)16:00~18:00", "전자관402/전자관420"))
         informationList.add(Data("인공지능입문", "교수4", "전공4", "월)15:00~16:30 수)09:00~10:30", "강의동102"))
-
+*/
 
         subjectList.clear()
         subjectList.add(MySubject(""))
@@ -91,8 +101,8 @@ class TimeTableActivity : AppCompatActivity() {
         for (i in 0..(informationList.size - 1)) { // 요일 따로, 시간따로 구분
 
             var timeNum: String = informationList.get(i).time
-            var timeNum_arr1 = timeNum.subSequence(2, 4).toString()
-            var timeNum_arr2 = timeNum.subSequence(5, 7).toString()
+            var timeNum_arr1 = timeNum.subSequence(3, 5).toString()//2,4
+            var timeNum_arr2 = timeNum.subSequence(6, 8).toString()//5,7
             var timeNum_arr3 = Integer.parseInt("$timeNum_arr1$timeNum_arr2")
             var timeNum_arr4 = Integer.parseInt("$timeNum_arr2")
             timeHalf.add(i, timeNum_arr4)
@@ -100,8 +110,8 @@ class TimeTableActivity : AppCompatActivity() {
 
 
 
-            timeNum_arr1 = timeNum.subSequence(8, 10).toString()
-            timeNum_arr2 = timeNum.subSequence(11, 13).toString()
+            timeNum_arr1 = timeNum.subSequence(9, 11).toString()//8,10
+            timeNum_arr2 = timeNum.subSequence(12, 14).toString()//11,13
             timeNum_arr3 = Integer.parseInt("$timeNum_arr1$timeNum_arr2")
             timeMax.add(i, timeNum_arr3)
 
