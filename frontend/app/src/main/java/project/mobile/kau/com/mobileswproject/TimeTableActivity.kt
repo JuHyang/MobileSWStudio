@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.widget.Button
@@ -13,19 +14,17 @@ import com.orm.SugarRecord
 class TimeTableActivity : AppCompatActivity() {
 
     var colors : ArrayList<Int> = arrayListOf()
+    var buttonAdd : Button? = null
+    var buttonRefresh : Button? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_time_table)
         initModel()
         initView()
-        val button : Button = findViewById(R.id.addButton)
-        button.setOnClickListener {
+        aboutView()
 
-            val intent = Intent(this,ScheduleSelectActivity::class.java)
-            startActivity(intent)
-
-        }
     }
 
     var recyclerView: RecyclerView? = null
@@ -45,14 +44,31 @@ class TimeTableActivity : AppCompatActivity() {
         recyclerViewAdapter?.notifyDataSetChanged()
     }
 
+    private fun aboutView () {
+        buttonAdd?.setOnClickListener {
+
+            val intent = Intent(this,ScheduleSelectActivity::class.java)
+            startActivity(intent)
+
+        }
+
+        buttonRefresh?.setOnClickListener {
+            openDialog()
+
+        }
+    }
+
     private fun initView() {
 
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView?.setHasFixedSize(false)
         recyclerViewManager = GridLayoutManager(this, 6)
-        recyclerViewAdapter = RecyclerViewer(subjectList)
+        recyclerViewAdapter = RecyclerViewer(this, subjectList)
         recyclerView?.layoutManager = recyclerViewManager
         recyclerView?.adapter = recyclerViewAdapter
+
+        buttonAdd = findViewById(R.id.addButton)
+        buttonRefresh = findViewById(R.id.buttonRefresh)
 
     }
 
@@ -344,5 +360,28 @@ class TimeTableActivity : AppCompatActivity() {
         }
 
         return max
+    }
+
+    fun openDialog () {
+        var builder : AlertDialog.Builder = AlertDialog.Builder(this)
+        builder.setTitle("확인")
+        builder.setMessage("시간표를 초기화 시키시겠습니까 ?")
+
+        builder.setPositiveButton("확인"){dialog, which ->
+            SugarRecord.deleteAll(Data::class.java)
+            informationList.clear()
+
+            initModel()
+            initView()
+            recyclerViewAdapter?.notifyDataSetChanged()
+
+            //알람 전체 삭제 들어가야함
+        }
+        builder.setNegativeButton("취소") {dialog, which ->
+
+        }
+
+        var alertDialog : AlertDialog = builder.create()
+        alertDialog.show()
     }
 }

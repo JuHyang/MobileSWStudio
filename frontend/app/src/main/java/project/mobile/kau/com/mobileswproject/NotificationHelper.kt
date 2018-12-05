@@ -1,5 +1,6 @@
 package com.example.administrator.alarmkau
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -40,7 +41,10 @@ class NotificationHelper(base: Context): ContextWrapper(base){
         builder.setContentTitle("그대여, 출첵은 하셨는가?")
         builder.setContentText("수업 출석체크 하려면 클릭!")//~~수업 내용은 추 후 수업 내용에 따라 달라져야 하므로 변수를 집어넣어 줄 것이다. aboutview 내부에서 변경되게끔!
         builder.setVibrate(vibrate)
+        builder.setWhen(System.currentTimeMillis())
+        builder.setPriority(Notification.PRIORITY_MAX)
         builder.setAutoCancel(true) //알림을 클릭했을 때 알림이 사라지도록
+        builder.setFullScreenIntent(pendingIntent, true);
         builder.setContentIntent(pendingIntent)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {//O는 오레오 버전임을 명시, 오레오 버전은 알림 채널이 명시돼야 한다.

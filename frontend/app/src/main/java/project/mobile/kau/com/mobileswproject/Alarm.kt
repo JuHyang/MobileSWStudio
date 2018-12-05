@@ -8,7 +8,6 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import kotlinx.android.synthetic.main.activity_main.*
 import project.mobile.kau.com.mobileswproject.Data
 import project.mobile.kau.com.mobileswproject.R
 import java.util.*
