@@ -1,5 +1,8 @@
 package project.mobile.kau.com.mobileswproject
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -11,7 +14,9 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
+import com.example.administrator.alarmkau.MyBroadCastReceiver
 import com.orm.SugarRecord
+import java.util.*
 
 class ScheduleSelectActivity: AppCompatActivity() {
 
@@ -28,6 +33,15 @@ class ScheduleSelectActivity: AppCompatActivity() {
     var dataBase = SugarRecord.listAll(Data::class.java) as ArrayList<Data> //for db
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        var alarmManager = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        var alarmIntent = Intent(this, MyBroadCastReceiver::class.java)
+        var pending: PendingIntent? = null
+        var pendingList = ArrayList<PendingIntent>()
+
+        var num = 0
+
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.schedule_select)
         val spinner_lecture = findViewById(R.id.spinner_major) as Spinner
@@ -79,8 +93,59 @@ class ScheduleSelectActivity: AppCompatActivity() {
                 dataBase.add(temp)
                 temp.save()
             }
+
+            for (item in final_list) {
+                num++
+                var pending = PendingIntent.getBroadcast(this, num, alarmIntent, 0)
+                pendingList.add(pending)
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, setTriggerTime(item,alarmManager, pending), 1000 * 60 * 60 * 24 * 7, pending)
+            }
+
             val intent = Intent(this,ScheduleActivity::class.java)
             startActivity(intent)
         }
+
+    }
+
+    fun setTriggerTime(classSchedule: Object, alarmManager: AlarmManager, pending:PendingIntent): Long {
+        //"금)09:00∼11:00"
+        val time = classSchedule.time.slice(2..classSchedule.time.length-1)
+        val temp = time.split("  ")
+        val temp1 = temp[0].split("~")
+        val hour = temp1[0].split(":")[0].toInt()
+        val minute = temp1[1].split(":")[0].toInt()
+
+        if(temp.size>1){
+            val temp2 = temp[1].split("~")
+            val hour2 = temp1[0].split(":")[0].toInt()
+            val minute2 = temp1[1].split(":")[0].toInt()
+
+            var atime: Long = System.currentTimeMillis()
+            var curTime = Calendar.getInstance()
+            curTime.set(Calendar.HOUR_OF_DAY, hour)
+            curTime.set(Calendar.MINUTE, minute - 10)
+            curTime.set(Calendar.SECOND, 0)
+            curTime.set(Calendar.MILLISECOND, 0)
+            var btime = curTime.timeInMillis
+            var triggerTime = btime
+            if (atime > btime) triggerTime += 1000 * 60 * 60 * 24 * 7 // 이미 지났을 경우엔 다음주로 넘겨 줌
+
+
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime , 1000 * 60 * 60 * 24 * 7, pending)
+
+        }
+
+        var atime: Long = System.currentTimeMillis()
+        var curTime = Calendar.getInstance()
+        curTime.set(Calendar.HOUR_OF_DAY, hour)
+        curTime.set(Calendar.MINUTE, minute - 10)
+        curTime.set(Calendar.SECOND, 0)
+        curTime.set(Calendar.MILLISECOND, 0)
+        var btime = curTime.timeInMillis
+        var triggerTime = btime
+        if (atime > btime) triggerTime += 1000 * 60 * 60 * 24 * 7 // 이미 지났을 경우엔 다음주로 넘겨 줌
+
+
+        return triggerTime
     }
 }

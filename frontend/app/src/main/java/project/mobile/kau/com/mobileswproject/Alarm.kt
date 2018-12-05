@@ -19,7 +19,7 @@ class Alarm : AppCompatActivity() {
     @SuppressLint("ServiceCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.schedule_main)
 
         val ScheduleArray = listOf<Data>(
             //Data("인공지능입문", 16, 18, 2),
@@ -32,8 +32,8 @@ class Alarm : AppCompatActivity() {
         var pending:PendingIntent? = null
         var pendingList = ArrayList<PendingIntent>()
 
-        val generateBtn = findViewById(R.id.generateBtn) as Button
-        val cancelBtn = findViewById(R.id.cancelBtn) as Button
+        val generateBtn = findViewById(R.id.button) as Button
+
 
         generateBtn.setOnClickListener({
             for (item in ScheduleArray) {
@@ -42,18 +42,17 @@ class Alarm : AppCompatActivity() {
                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, setTriggerTime(item), 1000 * 60 * 60 * 24 * 7, pending)
             }
         })
-
+/*
         cancelBtn.setOnClickListener({
             for(item in pendingList){
                 pending = item
                 alarmManager.cancel(pending)
             }
         })
-
+*/
     }
 
     private fun setTriggerTime(classSchedule: Data): Long {
-
         //"금)09:00∼11:00"
         val time = classSchedule.time.slice(2..classSchedule.time.length-1)
         val temp = time.split("~")
@@ -70,5 +69,6 @@ class Alarm : AppCompatActivity() {
         var triggerTime = btime
         if (atime > btime) triggerTime += 1000 * 60 * 60 * 24 * 7 // 이미 지났을 경우엔 다음주로 넘겨 줌
         return triggerTime
-    }*/
+    }
+    */
 }
