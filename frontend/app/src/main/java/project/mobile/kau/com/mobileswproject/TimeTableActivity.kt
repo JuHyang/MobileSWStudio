@@ -1,6 +1,8 @@
 package project.mobile.kau.com.mobileswproject
 
-import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
@@ -29,10 +31,10 @@ class TimeTableActivity : AppCompatActivity() {
 
     var recyclerView: RecyclerView? = null
     var recyclerViewManager: RecyclerView.LayoutManager? = null
-    var recyclerViewAdapter: RecyclerView.Adapter<RecyclerViewer.ViewHolder>? = null
+    var recyclerViewAdapter: RecyclerView.Adapter<TableAdapter.ViewHolder>? = null
 
-    var subjectList: ArrayList<MySubject> = arrayListOf()
-    var informationList: ArrayList<Data> = arrayListOf ()
+    var subjectList: ArrayList<TableData> = arrayListOf()
+    var informationList: ArrayList<ScheduleData> = arrayListOf ()
 
 
     override fun onResume() {
@@ -63,7 +65,7 @@ class TimeTableActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView?.setHasFixedSize(false)
         recyclerViewManager = GridLayoutManager(this, 6)
-        recyclerViewAdapter = RecyclerViewer(this, subjectList)
+        recyclerViewAdapter = TableAdapter(this, subjectList)
         recyclerView?.layoutManager = recyclerViewManager
         recyclerView?.adapter = recyclerViewAdapter
 
@@ -86,7 +88,7 @@ class TimeTableActivity : AppCompatActivity() {
 
 
         subjectList = arrayListOf()
-        informationList = SugarRecord.listAll(Data::class.java) as ArrayList<Data>
+        informationList = SugarRecord.listAll(ScheduleData::class.java) as ArrayList<ScheduleData>
 
         var time: Int = 9
         var half: Int = 30
@@ -106,19 +108,19 @@ class TimeTableActivity : AppCompatActivity() {
         var timeMax: ArrayList<Int> = ArrayList<Int>()
         var timeSecondMax: ArrayList<Int> = ArrayList<Int>()
         /*
-        informationList.add(Data("컴퓨터구조론", "교수1", "전공1", "월)10:30~12:00 수)10:30~12:00", "강의동101"))
-        informationList.add(Data("알고리즘", "교수2", "전공2", "화)10:30~12:00 목)10:30~12:00", "전자관402"))
-        informationList.add(Data("모바일sw", "교수3", "전공3", "수)14:00~16:00 수)16:00~18:00", "전자관402/전자관420"))
-        informationList.add(Data("인공지능입문", "교수4", "전공4", "월)15:00~16:30 수)09:00~10:30", "강의동102"))
+        informationList.add(ScheduleData("컴퓨터구조론", "교수1", "전공1", "월)10:30~12:00 수)10:30~12:00", "강의동101"))
+        informationList.add(ScheduleData("알고리즘", "교수2", "전공2", "화)10:30~12:00 목)10:30~12:00", "전자관402"))
+        informationList.add(ScheduleData("모바일sw", "교수3", "전공3", "수)14:00~16:00 수)16:00~18:00", "전자관402/전자관420"))
+        informationList.add(ScheduleData("인공지능입문", "교수4", "전공4", "월)15:00~16:30 수)09:00~10:30", "강의동102"))
 */
 
         subjectList.clear()
-        subjectList.add(MySubject(""))
-        subjectList.add(MySubject("월"))
-        subjectList.add(MySubject("화"))
-        subjectList.add(MySubject("수"))
-        subjectList.add(MySubject("목"))
-        subjectList.add(MySubject("금"))
+        subjectList.add(TableData(""))
+        subjectList.add(TableData("월"))
+        subjectList.add(TableData("화"))
+        subjectList.add(TableData("수"))
+        subjectList.add(TableData("목"))
+        subjectList.add(TableData("금"))
 
         var maxIndex = maxIndex (informationList)
         maxIndex /= 6
@@ -129,15 +131,15 @@ class TimeTableActivity : AppCompatActivity() {
             for (i in 0..5) {
                 if (i == 0) {
                     if (j % 2 == 0) {
-                        subjectList.add(MySubject((time.toString())))
+                        subjectList.add(TableData((time.toString())))
                     } else {//(j%2 == 1) j를 2로 나눈 나머지가 1이면 9시에서 10시로 증가
-                        subjectList.add(MySubject(""))
+                        subjectList.add(TableData(""))
                         //9:30분 없애고 싶으면 위에 내용 빈칸으로 설정
                         time++
                     }
                 } else {
                     if (j <= maxIndex) {
-                        subjectList.add(MySubject(""))
+                        subjectList.add(TableData(""))
                     }
                 }
             }
@@ -316,7 +318,7 @@ class TimeTableActivity : AppCompatActivity() {
     }
 
 
-    fun maxIndex (list : ArrayList<Data>) : Int {
+    fun maxIndex (list : ArrayList<ScheduleData>) : Int {
 
 
         var max = 0
@@ -368,7 +370,10 @@ class TimeTableActivity : AppCompatActivity() {
         builder.setMessage("시간표를 초기화 시키시겠습니까 ?")
 
         builder.setPositiveButton("확인"){dialog, which ->
-            SugarRecord.deleteAll(Data::class.java)
+            SugarRecord.deleteAll(ScheduleData::class.java)
+            for (data in informationList) {
+                alarmCancel(data)
+            }
             informationList.clear()
 
             initModel()
@@ -383,5 +388,20 @@ class TimeTableActivity : AppCompatActivity() {
 
         var alertDialog : AlertDialog = builder.create()
         alertDialog.show()
+    }
+
+    fun alarmCancel (data : ScheduleData) {
+        var alarmManager : AlarmManager = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        var dataId = data.id % 20
+        var times = data.time.split("  ")
+        for (time in times) {
+            var intent = Intent (this, ScheduleAlarmReceiver::class.java)
+            var pending = PendingIntent.getBroadcast(this, dataId.toInt(), intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            if (pending != null) {
+                alarmManager.cancel(pending)
+                pending.cancel()
+            }
+            dataId += 20
+        }
     }
 }

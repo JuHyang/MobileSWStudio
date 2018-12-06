@@ -1,17 +1,6 @@
 package com.example.administrator.alarmkau
 
-import android.annotation.SuppressLint
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-import android.widget.Button
-import project.mobile.kau.com.mobileswproject.Data
-import project.mobile.kau.com.mobileswproject.R
-import java.util.*
-import kotlin.collections.ArrayList
 
 class Alarm : AppCompatActivity() {
 /*
@@ -20,14 +9,14 @@ class Alarm : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.schedule_main)
 
-        val ScheduleArray = listOf<Data>(
-            //Data("인공지능입문", 16, 18, 2),
-            //Data("항공제어sw", 16, 19, 3),
-            //Data("알고리즘 해석 및 설계", 16, 20, 4)
+        val ScheduleArray = listOf<ScheduleData>(
+            //ScheduleData("인공지능입문", 16, 18, 2),
+            //ScheduleData("항공제어sw", 16, 19, 3),
+            //ScheduleData("알고리즘 해석 및 설계", 16, 20, 4)
         )
 
         var alarmManager = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        var alarmIntent = Intent(this, MyBroadCastReceiver::class.java)
+        var alarmIntent = Intent(this, ScheduleAlarmReceiver::class.java)
         var pending:PendingIntent? = null
         var pendingList = ArrayList<PendingIntent>()
 
@@ -51,7 +40,7 @@ class Alarm : AppCompatActivity() {
 */
     }
 
-    private fun setTriggerTime(classSchedule: Data): Long {
+    private fun setTriggerTime(classSchedule: ScheduleData): Long {
         //"금)09:00∼11:00"
         val time = classSchedule.time.slice(2..classSchedule.time.length-1)
         val temp = time.split("~")

@@ -1,6 +1,5 @@
 package project.mobile.kau.com.mobileswproject
 
-import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -8,9 +7,9 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 
-class ScheduleSelectedAdapter(val final : ArrayList<Object>) : RecyclerView.Adapter<ScheduleSelectedAdapter.ViewHolder>() {
+class ScheduleSelectedAdapter(val aFinal : ArrayList<ScheduleData>) : RecyclerView.Adapter<ScheduleSelectedAdapter.ViewHolder>() {
     override fun getItemCount(): Int {
-        return final.size
+        return aFinal.size
     }
     class ViewHolder(val view : View) : RecyclerView.ViewHolder(view) {
         var name = view.findViewById(R.id.lecture) as TextView
@@ -24,10 +23,10 @@ class ScheduleSelectedAdapter(val final : ArrayList<Object>) : RecyclerView.Adap
     }
     override fun onBindViewHolder(holder : ScheduleSelectedAdapter.ViewHolder, position: Int) {
         holder.btn.setOnClickListener {
-            final.removeAt(position)
+            aFinal.removeAt(position)
             notifyDataSetChanged()
         }
-        holder.name.text = final[position].subject
-        holder.professor.text = final[position].professor
+        holder.name.text = aFinal[position].subject
+        holder.professor.text = aFinal[position].professor
     }
 }

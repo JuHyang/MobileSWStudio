@@ -7,5 +7,5 @@ data class Object(var subject: String, var professor: String, var major:String, 
 
 interface ServerInterface {
     @GET("/schedule")
-    fun getObject(): Call<ArrayList<Object>>
+    fun getObject(): Call<ArrayList<ScheduleData>>
 }

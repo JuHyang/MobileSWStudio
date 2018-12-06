@@ -14,7 +14,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
-import com.example.administrator.alarmkau.MyBroadCastReceiver
 import com.orm.SugarRecord
 import java.util.*
 
@@ -26,32 +25,70 @@ class ScheduleSelectActivity: AppCompatActivity() {
     private lateinit var selected_recyclerView: RecyclerView
     private lateinit var selected_viewAdapter: RecyclerView.Adapter<*>
     private lateinit var selected_viewManager: RecyclerView.LayoutManager
+
+    var alarmManager : AlarmManager? = null
+
+
+    var spinner_lecture : Spinner? = null
+    var add : Button? = null
+
     var major = ""
-    var objects: ArrayList<Object> = arrayListOf()
-    var select_object :ArrayList<Object> = arrayListOf()
-    var final_list : ArrayList<Object> = arrayListOf()
-    var dataBase = SugarRecord.listAll(Data::class.java) as ArrayList<Data> //for db
+    var objects: ArrayList<ScheduleData> = arrayListOf()
+    var select_object :ArrayList<ScheduleData> = arrayListOf()
+    var final_list : ArrayList<ScheduleData> = arrayListOf()
+    var dataBase = SugarRecord.listAll(ScheduleData::class.java) as ArrayList<ScheduleData> //for db
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        var alarmManager = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        var alarmIntent = Intent(this, MyBroadCastReceiver::class.java)
-        var pending: PendingIntent? = null
-        var pendingList = ArrayList<PendingIntent>()
-
-        var num = 0
-
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.schedule_select)
-        val spinner_lecture = findViewById(R.id.spinner_major) as Spinner
-        spinner_lecture.adapter = ArrayAdapter.createFromResource(this,R.array.major,android.R.layout.simple_spinner_item)
-        spinner_lecture.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+        alarmManager = this.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        initView()
+
+        initRecycler()
+        initModel()
+        aboutView()
+    }
+
+    fun initView () {
+        add = findViewById(R.id.add)
+        spinner_lecture = findViewById(R.id.spinner_major)
+
+
+
+    }
+
+    fun initModel () {
+        ScheduleGetServerInfo().getText(objects,select_object, selecting_viewAdapter)
+    }
+
+    fun initRecycler () {
+        selected_viewManager = LinearLayoutManager(this,OrientationHelper.HORIZONTAL,false)
+        selected_viewAdapter = ScheduleSelectedAdapter(final_list)
+        selected_recyclerView = findViewById<RecyclerView>(R.id.selectedRecyclerView).apply {
+            setHasFixedSize(true)
+            layoutManager = selected_viewManager
+            adapter = selected_viewAdapter
+        }
+
+
+        selecting_viewManager = LinearLayoutManager(this)
+        selecting_viewAdapter = ScheduleListAdapter(select_object,selected_viewAdapter as ScheduleSelectedAdapter,major)
+        selecting_recyclerView = findViewById<RecyclerView>(R.id.selectingRecyclerView).apply {
+            setHasFixedSize(true)
+            layoutManager = selecting_viewManager
+            adapter = selecting_viewAdapter
+        }
+
+    }
+
+    fun aboutView () {
+        spinner_lecture?.adapter = ArrayAdapter.createFromResource(this,R.array.major,android.R.layout.simple_spinner_item)
+        spinner_lecture?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onNothingSelected(parent: AdapterView<*>?) {
 
             }
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                major = spinner_lecture.getItemAtPosition(position).toString()
+                major = spinner_lecture?.getItemAtPosition(position).toString()
                 select_object.clear()
                 var major_list_string = arrayOf("전체","경영학부", "무인기융합전공", "물류전공", "소프트웨어학과", "영어학과", "인문자연학부", "자율주행융합전공"
                         , "항공교통물류학부", "항공교통전공", "항공우주및기계공학부", "항공우주법전공", "항공운항학과", "항공재료공학과", "항공전자정보공학부")
@@ -69,82 +106,59 @@ class ScheduleSelectActivity: AppCompatActivity() {
             }
         }
 
-        selected_viewManager = LinearLayoutManager(this,OrientationHelper.HORIZONTAL,false)
-        selected_viewAdapter = ScheduleSelectedAdapter(final_list)
-        selected_recyclerView = findViewById<RecyclerView>(R.id.selectedRecyclerView).apply {
-            setHasFixedSize(true)
-            layoutManager = selected_viewManager
-            adapter = selected_viewAdapter
-        }
 
-        selecting_viewManager = LinearLayoutManager(this)
-        selecting_viewAdapter = ScheduleAdapter(select_object,selected_viewAdapter as ScheduleSelectedAdapter,major)
-        selecting_recyclerView = findViewById<RecyclerView>(R.id.selectingRecyclerView).apply {
-            setHasFixedSize(true)
-            layoutManager = selecting_viewManager
-            adapter = selecting_viewAdapter
-        }
-        ScheduleGetServerInfo().getText(objects,select_object, selecting_viewAdapter as ScheduleAdapter)
 
-        val add: Button = findViewById(R.id.add)
-        add.setOnClickListener {
-            for(i:Int in 0..final_list.size-1) {
-                var room_temp = final_list[i].room[0] + final_list[i].room.subSequence(3, 6).toString()
-                val temp = Data(final_list[i].subject, final_list[i].professor, final_list[i].major, final_list[i].time, room_temp)
+        add?.setOnClickListener {
+            for(i in final_list) {
+                var temp = i
+                var room_temp = temp.room[0] + temp.room.subSequence(3, 6).toString()
+                temp.room = room_temp
                 dataBase.add(temp)
                 temp.save()
             }
 
-            for (item in final_list) {
-                num++
-                var pending = PendingIntent.getBroadcast(this, num, alarmIntent, 0)
-                pendingList.add(pending)
-                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, setTriggerTime(item,alarmManager, pending), 1000 * 60 * 60 * 24 * 7, pending)
+            for (item in dataBase) {
+                setAlarm(item)
             }
 
             finish()
         }
-
     }
 
-    fun setTriggerTime(classSchedule: Object, alarmManager: AlarmManager, pending:PendingIntent): Long {
-        //"금)09:00∼11:00"
-        val time = classSchedule.time.slice(2..classSchedule.time.length-1)
-        val temp = time.split("  ")
-        val temp1 = temp[0].split("∼")
-        val hour = temp1[0].split(":")[0].toInt()
-        val minute = temp1[1].split(":")[0].toInt()
-
-        if(temp.size>1){
-            val temp2 = temp[1].split("∼")
-            val hour2 = temp1[0].split(":")[0].toInt()
-            val minute2 = temp1[1].split(":")[0].toInt()
-
-            var atime: Long = System.currentTimeMillis()
-            var curTime = Calendar.getInstance()
-            curTime.set(Calendar.HOUR_OF_DAY, hour)
-            curTime.set(Calendar.MINUTE, minute - 10)
-            curTime.set(Calendar.SECOND, 0)
-            curTime.set(Calendar.MILLISECOND, 0)
-            var btime = curTime.timeInMillis
-            var triggerTime = btime
-            if (atime > btime) triggerTime += 1000 * 60 * 60 * 24 * 7 // 이미 지났을 경우엔 다음주로 넘겨 줌
-
-
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, triggerTime , 1000 * 60 * 60 * 24 * 7, pending)
-
+    fun setAlarm (item : ScheduleData) {
+        var id = item.id % 20
+        var time = item.time
+        var time_list = time.split("  ")
+        for (i in time_list) {
+            var triggerTime = setTriggerTime (i)
+            var alarmIntent = Intent(this, ScheduleAlarmReceiver::class.java)
+            alarmIntent.putExtra("id", id)
+            var pending = PendingIntent.getBroadcast(this, id.toInt(), alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            alarmManager?.setInexactRepeating(AlarmManager.RTC_WAKEUP, triggerTime, 86400000, pending)
+            id += 20
         }
+    }
 
-        var atime: Long = System.currentTimeMillis()
-        var curTime = Calendar.getInstance()
-        curTime.set(Calendar.HOUR_OF_DAY, hour)
-        curTime.set(Calendar.MINUTE, minute - 10)
-        curTime.set(Calendar.SECOND, 0)
-        curTime.set(Calendar.MILLISECOND, 0)
-        var btime = curTime.timeInMillis
-        var triggerTime = btime
-        if (atime > btime) triggerTime += 1000 * 60 * 60 * 24 * 7 // 이미 지났을 경우엔 다음주로 넘겨 줌
+    fun setTriggerTime(time: String): Long {
+        //"금)09:00∼11:00"
+        var time_origin = time.slice(2 until time.length)
+        var time_start = time_origin.split("∼")
+        var time_list = time_start[0].split(":")
+        var time_hour = time_list[0].toInt()
+        var time_minuite = time_list[1].toInt()
 
+        var currentTime = System.currentTimeMillis()
+        var registerTime = Calendar.getInstance()
+        registerTime.set(Calendar.HOUR_OF_DAY, time_hour)
+        registerTime.set(Calendar.MINUTE, time_minuite - 10)
+        registerTime.set(Calendar.SECOND, 0)
+        registerTime.set(Calendar.MILLISECOND, 0)
+
+        var triggerTime = registerTime.timeInMillis
+
+        if (currentTime > triggerTime) {
+            triggerTime += 86400000
+        }
 
         return triggerTime
     }
