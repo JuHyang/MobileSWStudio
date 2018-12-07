@@ -36,7 +36,7 @@ class ScheduleSelectActivity: AppCompatActivity() {
     var objects: ArrayList<ScheduleData> = arrayListOf()
     var select_object :ArrayList<ScheduleData> = arrayListOf()
     var final_list : ArrayList<ScheduleData> = arrayListOf()
-    var dataBase = SugarRecord.listAll(ScheduleData::class.java) as ArrayList<ScheduleData> //for db
+    var dataBase : ArrayList<ScheduleData> = arrayListOf() //for db
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,10 +109,21 @@ class ScheduleSelectActivity: AppCompatActivity() {
 
 
         add?.setOnClickListener {
+            var temp : ScheduleData? = null
             for(i in final_list) {
-                var temp = i
-                var room_temp = temp.room[0] + temp.room.subSequence(3, 6).toString()
-                temp.room = room_temp
+                temp = i
+                var roomResult = ""
+                var roomTemp = temp.room.split(" / ")
+                var size = roomTemp.size
+                for (j in 0..(size - 1)) {
+                    if (roomTemp[j].length < 2) {
+                        if (j > 0) {
+                            roomResult += "/"
+                        }
+                        roomResult += roomTemp[j][0] + roomTemp[j].subSequence(3, 6).toString()
+                    }
+                }
+                temp.room = roomResult
                 dataBase.add(temp)
                 temp.save()
             }
@@ -149,6 +160,15 @@ class ScheduleSelectActivity: AppCompatActivity() {
 
         var currentTime = System.currentTimeMillis()
         var registerTime = Calendar.getInstance()
+
+
+
+//        var c = Calendar.getInstance()
+//        var minute = c.get(Calendar.MINUTE)
+
+//        registerTime.set(Calendar.HOUR_OF_DAY, 10)
+//        registerTime.set(Calendar.MINUTE, minute + 1)
+
         registerTime.set(Calendar.HOUR_OF_DAY, time_hour)
         registerTime.set(Calendar.MINUTE, time_minuite - 10)
         registerTime.set(Calendar.SECOND, 0)

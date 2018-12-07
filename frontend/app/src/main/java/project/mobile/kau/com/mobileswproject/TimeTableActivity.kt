@@ -39,7 +39,6 @@ class TimeTableActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        println("Hello")
 
         initModel()
         initView()

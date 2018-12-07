@@ -15,13 +15,16 @@ class ScheduleAlarmReceiver : BroadcastReceiver(){
     var datas = SugarRecord.listAll(ScheduleData::class.java)
 
     override fun onReceive(context: Context, intent: Intent) {
+        println("AlarmReceiver")
         val notificationHelper = ScheduleNotification(context)
         extra = intent.extras
         var id = extra?.getLong("id")
-
+        println (id)
         if (checkDay(id)) {
+            println("notification")
             notificationHelper.initView()
             notificationHelper.generateAlarm()
+            println ("finish")
         }
     }
 
@@ -40,15 +43,16 @@ class ScheduleAlarmReceiver : BroadcastReceiver(){
             7 -> dayString = "토"
         }
 
+
         if (id != null) {
             for (data in datas) {
                 var dataId = data.id
                 if (dataId == id) {
-                    dataDay = data.room[0].toString()
+                    dataDay = data.time[0].toString()
                     return dataDay == dayString
                 } else if (dataId + 20 == id) {
-                    var room_temp = data.room.split("  ")
-                    dataDay = room_temp[1][0].toString()
+                    var timeTemp = data.time.split("  ")
+                    dataDay = timeTemp[1][0].toString()
                     return dataDay == dayString
                 }
             }

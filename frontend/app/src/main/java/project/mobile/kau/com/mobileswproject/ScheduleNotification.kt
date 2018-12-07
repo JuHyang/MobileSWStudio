@@ -25,19 +25,17 @@ class ScheduleNotification(base: Context): ContextWrapper(base){
     internal var exist : Boolean = false
     var minute = 0
 
-    var push : Intent? = null
-
     fun initView(){
-        kauIntent = packageManager.getLaunchIntentForPackage("kr.co.symtra.kauid")
-        builder = NotificationCompat.Builder(this, "default")
         exist = packageList
+        builder = NotificationCompat.Builder(this, "default")
         if (exist) { //유저 핸드폰 내에 KAU ID 어플리케이션이 Exist할 때만 KAUintent를 실행해 줌, 앱이 없다면 알림 클릭 시 아무런 동작도 하지 않는다.
-            pendingIntent = PendingIntent.getActivity(this, 1, kauIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            kauIntent = packageManager.getLaunchIntentForPackage("kr.co.symtra.kauid")
+            pendingIntent = PendingIntent.getActivity(this, 0, kauIntent, PendingIntent.FLAG_UPDATE_CURRENT)
         } else {
             var intent = Intent (this, SplashActivity::class.java). apply {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             }
-            pendingIntent = PendingIntent.getActivity(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
         mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager//오레오 버전은 notification 채널을 등록해 줘야 함
@@ -52,6 +50,7 @@ class ScheduleNotification(base: Context): ContextWrapper(base){
         builder.setContentTitle("그대여, 출첵은 하셨는가?")
         builder.setContentText("수업 출석체크 하려면 클릭!")//~~수업 내용은 추 후 수업 내용에 따라 달라져야 하므로 변수를 집어넣어 줄 것이다. aboutview 내부에서 변경되게끔!
         builder.setVibrate(vibrate)
+        builder.setTicker("출석하세요 !")
         builder.setWhen(System.currentTimeMillis())
         builder.priority = Notification.PRIORITY_MAX
         builder.setAutoCancel(true) //알림을 클릭했을 때 알림이 사라지도록
@@ -61,7 +60,7 @@ class ScheduleNotification(base: Context): ContextWrapper(base){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {//O는 오레오 버전임을 명시, 오레오 버전은 알림 채널이 명시돼야 한다.
             mNotificationManager.createNotificationChannel(NotificationChannel("default", "NotiChannel", NotificationManager.IMPORTANCE_DEFAULT))
         }
-        mNotificationManager.notify(1, builder.build())
+        mNotificationManager.notify(0, builder.build())
 
     }
 
