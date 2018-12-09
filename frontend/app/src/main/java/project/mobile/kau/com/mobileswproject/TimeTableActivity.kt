@@ -48,7 +48,7 @@ class TimeTableActivity : AppCompatActivity() {
     private fun aboutView () {
         buttonAdd?.setOnClickListener {
 
-            val intent = Intent(this,ScheduleSelectActivity::class.java)
+            val intent = Intent(this,ScheduleListtActivity::class.java)
             startActivity(intent)
 
         }

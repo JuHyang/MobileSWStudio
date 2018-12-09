@@ -22,7 +22,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ScheduleSelectActivity" />
+        <activity android:name=".ScheduleListtActivity" />
 
         <meta-data
             android:name="DATABASE"

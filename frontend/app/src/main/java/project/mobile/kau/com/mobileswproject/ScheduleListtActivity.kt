@@ -9,15 +9,14 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.OrientationHelper
 import android.support.v7.widget.RecyclerView
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Spinner
+import android.widget.*
 import com.orm.SugarRecord
 import java.util.*
 
-class ScheduleSelectActivity: AppCompatActivity() {
+class ScheduleListtActivity: AppCompatActivity() {
 
     private lateinit var selecting_recyclerView: RecyclerView
     private lateinit var selecting_viewAdapter: RecyclerView.Adapter<*>
@@ -31,6 +30,7 @@ class ScheduleSelectActivity: AppCompatActivity() {
 
     var spinner_lecture : Spinner? = null
     var add : Button? = null
+    var editTextSearch : EditText? = null
 
     var major = ""
     var objects: ArrayList<ScheduleData> = arrayListOf()
@@ -52,6 +52,7 @@ class ScheduleSelectActivity: AppCompatActivity() {
     fun initView () {
         add = findViewById(R.id.add)
         spinner_lecture = findViewById(R.id.spinner_major)
+        editTextSearch = findViewById(R.id.editTextSearch)
 
 
 
@@ -72,7 +73,7 @@ class ScheduleSelectActivity: AppCompatActivity() {
 
 
         selecting_viewManager = LinearLayoutManager(this)
-        selecting_viewAdapter = ScheduleListAdapter(select_object,selected_viewAdapter as ScheduleSelectedAdapter,major)
+        selecting_viewAdapter = ScheduleListAdapter(this, select_object,selected_viewAdapter as ScheduleSelectedAdapter,major)
         selecting_recyclerView = findViewById<RecyclerView>(R.id.selectingRecyclerView).apply {
             setHasFixedSize(true)
             layoutManager = selecting_viewManager
@@ -134,7 +135,28 @@ class ScheduleSelectActivity: AppCompatActivity() {
 
             finish()
         }
-    }
+        editTextSearch?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                println(p0)
+                select_object.clear()
+                for (schedule in objects) {
+                    if (p0.toString() in schedule.subject) {
+                        select_object.add(schedule)
+                    }
+                }
+                selecting_recyclerView.adapter?.notifyDataSetChanged()
+
+            }
+        })
+}
 
     fun setAlarm (item : ScheduleData) {
         var id = item.id % 20
