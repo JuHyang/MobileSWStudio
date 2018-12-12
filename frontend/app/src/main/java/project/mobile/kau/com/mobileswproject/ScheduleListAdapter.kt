@@ -59,7 +59,7 @@ class ScheduleListAdapter(val context : Activity, val select : ArrayList<Schedul
                 finalAdapter.aFinal.add(0, selectedSchedule)
                 finalAdapter.notifyDataSetChanged()
             } else {
-                var toast = Toast.makeText(context, "이미 등록되어 있거나, 시간이 겹치는 과목임니다.", Toast.LENGTH_LONG)
+                var toast = Toast.makeText(context, "이미 등록되어 있거나, 시간이 겹치는 과목입니다.", Toast.LENGTH_LONG)
                 toast.show()
             }
 

@@ -23,7 +23,7 @@ class ScheduleAlarmReceiver : BroadcastReceiver(){
         if (checkDay(id)) {
             println("notification")
             notificationHelper.initView()
-            notificationHelper.generateAlarm()
+            notificationHelper.generateAlarm(id)
             println ("finish")
         }
     }
@@ -45,16 +45,15 @@ class ScheduleAlarmReceiver : BroadcastReceiver(){
 
 
         if (id != null) {
-            for (data in datas) {
-                var dataId = data.id
-                if (dataId == id) {
-                    dataDay = data.time[0].toString()
-                    return dataDay == dayString
-                } else if (dataId + 20 == id) {
-                    var timeTemp = data.time.split("  ")
-                    dataDay = timeTemp[1][0].toString()
-                    return dataDay == dayString
-                }
+            var data = SugarRecord.findById(ScheduleData::class.java, id)
+            var dataId = data.id
+            if (dataId == id) {
+                dataDay = data.time[0].toString()
+                return dataDay == dayString
+            } else if (dataId + 20 == id) {
+                var timeTemp = data.time.split("  ")
+                dataDay = timeTemp[1][0].toString()
+                return dataDay == dayString
             }
         }
         return false

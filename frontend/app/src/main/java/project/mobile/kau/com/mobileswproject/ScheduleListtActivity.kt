@@ -159,14 +159,14 @@ class ScheduleListtActivity: AppCompatActivity() {
 }
 
     fun setAlarm (item : ScheduleData) {
-        var id = item.id % 20
+        var id = item.id
         var time = item.time
         var time_list = time.split("  ")
         for (i in time_list) {
             var triggerTime = setTriggerTime (i)
             var alarmIntent = Intent(this, ScheduleAlarmReceiver::class.java)
             alarmIntent.putExtra("id", id)
-            var pending = PendingIntent.getBroadcast(this, id.toInt(), alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+            var pending = PendingIntent.getBroadcast(this, (id % 20).toInt(), alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT)
             alarmManager?.setInexactRepeating(AlarmManager.RTC_WAKEUP, triggerTime, 86400000, pending)
             id += 20
         }
